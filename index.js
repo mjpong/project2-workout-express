@@ -5,9 +5,7 @@ const cors = require("cors");
 require('dotenv').config();
 const ObjectId = require('mongodb').ObjectId;
 const MongoUtil = require('./MongoUtil');
-const {
-    ObjectID
-} = require("bson");
+const { ObjectID } = require("bson");
 const mongoURL = process.env.MONGO_URL;
 
 
@@ -85,6 +83,14 @@ async function main() {
             muscle_group[i]._id = new ObjectId(muscle_group[i]._id)
         }
 
+        if(focus == null){
+            focus = []
+        }
+
+        if(muscle_group == null){
+            muscle_group=[]
+        }
+
         try {
             let db = MongoUtil.getDB();
             let result = await db.collection("workout_entry").insertOne({
@@ -95,7 +101,8 @@ async function main() {
                 intensity,
                 duration,
                 single_exercise,
-                muscle_group
+                muscle_group,
+                comments: []
             })
             res.status(200);
             res.send(result);
@@ -200,15 +207,13 @@ async function main() {
             let results = await db.collection("workout_entry").find({
                 "_id": ObjectId(req.params.id)
             }).project({
-                'comment': 1
-            }).sort({
-                comment_date: -1
+                'comments': 1
             }).toArray()
 
             res.status(200)
             res.send(results)
 
-        } catch (e) {
+            } catch (e) {
             res.status(500)
             res.send({
                 "Message": "Unable to get comments"
@@ -306,17 +311,22 @@ async function main() {
                 '_id': ObjectId(req.params.id)
             })
 
+            // Step 1: retrieve the workout using workout id
+            // Step 2: loop through the comment array, and find the index of the matched comment
+            // Step 3: using split to remove the comment
+            // Step 4: update the workout with the new record
+
             res.send(results)
             res.sendStatus(200)
 
         } catch (e) {
-            res.sendStatus(500)
+            
             res.send({
                 "Message": "Unable to delete comment"
             })
+            res.sendStatus(500)
         }
     })
-
 
 
 }
