@@ -5,7 +5,9 @@ const cors = require("cors");
 require('dotenv').config();
 const ObjectId = require('mongodb').ObjectId;
 const MongoUtil = require('./MongoUtil');
-const { ObjectID } = require("bson");
+const {
+    ObjectID
+} = require("bson");
 const mongoURL = process.env.MONGO_URL;
 
 
@@ -83,12 +85,12 @@ async function main() {
             muscle_group[i]._id = new ObjectId(muscle_group[i]._id)
         }
 
-        if(focus == null){
+        if (focus == null) {
             focus = []
         }
 
-        if(muscle_group == null){
-            muscle_group=[]
+        if (muscle_group == null) {
+            muscle_group = []
         }
 
         try {
@@ -104,11 +106,11 @@ async function main() {
                 muscle_group,
                 comments: []
             })
-            res.status(200);
+            res.statusCode(200);
             res.send(result);
         } catch (e) {
             res.send("Server Error")
-            res.status(500);
+            res.statusCode(500);
             console.log(e)
         }
     })
@@ -121,10 +123,10 @@ async function main() {
             let result = await db.collection("workout_entry").findOne({
                 '_id': ObjectId(req.params.id)
             });
-            res.status(200)
+            res.statusCode(200)
             res.send(result)
         } catch (e) {
-            res.status(500)
+            res.statusCode(500)
             res.send({
                 "Message": "Unable to get workouts"
             })
@@ -163,12 +165,12 @@ async function main() {
                 }
 
             });
-            res.status(200);
+            res.statusCode(200);
             res.send({
                 'Message': 'Workout updated'
             })
         } catch (e) {
-            res.status(500);
+            res.statusCode(500);
             res.send({
                 'Message': "Unable to update workout"
             })
@@ -186,10 +188,10 @@ async function main() {
             })
 
             res.send(results)
-            res.sendStatus(200)
+            res.statusCode(200)
 
         } catch (e) {
-            res.sendStatus(500)
+            res.statusCode(500)
             res.send({
                 "Message": "Unable to delete workouts"
             })
@@ -210,11 +212,11 @@ async function main() {
                 'comments': 1
             }).toArray()
 
-            res.status(200)
+            res.statusCode(200)
             res.send(results)
 
-            } catch (e) {
-            res.status(500)
+        } catch (e) {
+            res.statusCode(500)
             res.send({
                 "Message": "Unable to get comments"
             })
@@ -244,11 +246,11 @@ async function main() {
                     }
                 }
             })
-            res.status(200)
+            res.statusCode(200)
             res.send(results)
 
         } catch (e) {
-            res.status(500)
+            res.statusCode(500)
             res.send({
                 "Message": "Unable to insert comment"
             });
@@ -288,12 +290,12 @@ async function main() {
 
             })
 
-            res.status(200)
+            res.statusCode(200)
             res.send(results)
 
         } catch (e) {
 
-            res.status(500)
+            res.statusCode(500)
             res.send({
                 "Message": "Unable to update comment"
             });
@@ -303,28 +305,49 @@ async function main() {
 
     // Each Comment - Delete
 
-    app.delete('/workouts/:id/comments/delete/', async (req, res) => {
+    app.delete('/workouts/:id/comments/:c_id', async (req, res) => {
         try {
             let db = MongoUtil.getDB();
-            
-            let results = await db.collection("workout_entry").deleteOne({
+
+            // let results = await db.collection("workout_entry").deleteOne({
+            //     '_id': ObjectId(req.params.id)
+            // })
+
+            // Step 1: retrieve the workout using workout id
+            let workout = await db.collection("workout_entry").findOne({
                 '_id': ObjectId(req.params.id)
             })
 
-            // Step 1: retrieve the workout using workout id
-            // Step 2: loop through the comment array, and find the index of the matched comment
-            // Step 3: using split to remove the comment
-            // Step 4: update the workout with the new record
+            if (workout) {
+                let clone = []
+                if (workout.comments.length > 1) {
+                    let oldComment = workout.comments;
+                    let indexToDelete = oldComment.findIndex((s) => {
+                        return s.id == req.params.c_id;
+                    });
 
-            res.send(results)
-            res.sendStatus(200)
+                    clone = [
+                        ...oldComment.slice(0, indexToDelete),
+                        ...oldComment.slice(indexToDelete + 1)
+                    ];
+                }
 
+                let results = await db.collection("workout_entry").updateOne({
+                    '_id': ObjectId(req.params.id)
+                }, {
+                    $set: {
+                        "comments": clone
+                    }
+                })
+
+                res.statusCode = 200
+                res.send(results)
+            }
         } catch (e) {
-            
+            res.statusCode = 500
             res.send({
                 "Message": "Unable to delete comment"
             })
-            res.sendStatus(500)
         }
     })
 
