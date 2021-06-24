@@ -53,10 +53,11 @@ async function main() {
         try {
             let db = MongoUtil.getDB();
             let workout_entry = await db.collection("workout_entry").find().toArray();
+            
+            res.statusCode = 200
             res.send(workout_entry)
-            res.sendStatus(200)
         } catch (e) {
-            res.sendStatus(500)
+            res.statusCode = 500
             res.send({
                 "Message": "Unable to get workouts"
             })
@@ -106,11 +107,11 @@ async function main() {
                 muscle_group,
                 comments: []
             })
-            res.statusCode(200);
+            res.statusCode = 200
             res.send(result);
         } catch (e) {
             res.send("Server Error")
-            res.statusCode(500);
+            res.statusCode = 500
             console.log(e)
         }
     })
@@ -123,10 +124,10 @@ async function main() {
             let result = await db.collection("workout_entry").findOne({
                 '_id': ObjectId(req.params.id)
             });
-            res.statusCode(200)
+            res.statusCode = 200
             res.send(result)
         } catch (e) {
-            res.statusCode(500)
+            res.statusCode = 500
             res.send({
                 "Message": "Unable to get workouts"
             })
@@ -165,12 +166,12 @@ async function main() {
                 }
 
             });
-            res.statusCode(200);
+            res.statusCode = 200
             res.send({
                 'Message': 'Workout updated'
             })
         } catch (e) {
-            res.statusCode(500);
+            res.statusCode = 500
             res.send({
                 'Message': "Unable to update workout"
             })
@@ -187,11 +188,12 @@ async function main() {
                 '_id': ObjectId(req.params.id)
             })
 
+            res.statusCode = 200
             res.send(results)
-            res.statusCode(200)
+            
 
         } catch (e) {
-            res.statusCode(500)
+            res.statusCode = 500
             res.send({
                 "Message": "Unable to delete workouts"
             })
@@ -212,11 +214,11 @@ async function main() {
                 'comments': 1
             }).toArray()
 
-            res.statusCode(200)
+            res.statusCode = 200
             res.send(results)
 
         } catch (e) {
-            res.statusCode(500)
+            res.statusCode = 500
             res.send({
                 "Message": "Unable to get comments"
             })
@@ -246,11 +248,11 @@ async function main() {
                     }
                 }
             })
-            res.statusCode(200)
+            res.statusCode = 200
             res.send(results)
 
         } catch (e) {
-            res.statusCode(500)
+            res.statusCode = 500
             res.send({
                 "Message": "Unable to insert comment"
             });
@@ -261,7 +263,7 @@ async function main() {
 
     // Each Comment - Put
 
-    app.put('/workouts/:id/comments/edit', async (req, res) => {
+    app.put('/workouts/:id/comments/edit/:c_id', async (req, res) => {
 
         try {
             let db = MongoUtil.getDB()
@@ -290,12 +292,12 @@ async function main() {
 
             })
 
-            res.statusCode(200)
+            res.statusCode = 200
             res.send(results)
 
         } catch (e) {
 
-            res.statusCode(500)
+            res.statusCode = 500
             res.send({
                 "Message": "Unable to update comment"
             });
