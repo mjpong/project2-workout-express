@@ -293,7 +293,9 @@ async function main() {
             })
 
             res.statusCode = 200
-            res.send(results)
+            res.send({
+                'message': 'Comments Updated'
+            })
 
         } catch (e) {
 
