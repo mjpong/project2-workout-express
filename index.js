@@ -53,7 +53,7 @@ async function main() {
         try {
             let db = MongoUtil.getDB();
             let workout_entry = await db.collection("workout_entry").find().toArray();
-            
+
             res.statusCode = 200
             res.send(workout_entry)
         } catch (e) {
@@ -190,7 +190,7 @@ async function main() {
 
             res.statusCode = 200
             res.send(results)
-            
+
 
         } catch (e) {
             res.statusCode = 500
@@ -353,6 +353,74 @@ async function main() {
                 "Message": "Unable to delete comment"
             })
         }
+    })
+
+    // Get workout based on Search
+    app.get("/workouts/search", async (req, res) => {
+        let criteria = {}
+
+        if (req.query.name) {
+            criteria['name'] = {
+                $regex: req.query.name,
+                $options: "i"
+            }
+        }
+
+        if (req.query.difficulty) {
+            criteria['difficulty'] = {
+                $regex: req.query.difficulty,
+                $options: "i"
+            }
+        }
+
+        if (req.query.intensity) {
+            criteria['intensity'] = {
+                $regex: req.query.intensity,
+                $options: "i"
+            }
+        }
+
+        if (req.query.focus) {
+            criteria['focus'] = {
+                $in: [req.query.focus]
+            }
+        }
+
+        if (req.query.single_exercise) {
+            criteria['single_exercise'] = {
+                $in: [req.query.single_exercise]
+            }
+        }
+
+        if (req.query.muscle_group) {
+            criteria['muscle_group'] = {
+                $in: [req.query.muscle_group]
+            }
+        }
+
+        if (req.query.name) {
+            criteria['name'] = {
+                $regex: req.query.name,
+                $options: "i"
+            }
+        }
+
+        try {
+            let db = MongoUtil.getDB()
+            let result = await db.collection("workout_entry").find(criteria).sort({
+                _id: -1
+            }).toArray();
+
+            res.statusCode = 200
+            res.send(result)
+        } catch (e) {
+            res.statusCode = 500
+            res.send({
+                "Message": "Unable to update comment"
+            });
+            console.log(e)
+        }
+
     })
 
 
