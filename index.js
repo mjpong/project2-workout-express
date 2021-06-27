@@ -423,6 +423,24 @@ async function main() {
 
     })
 
+    // Get workout based on different filters
+
+    //  Muscle group - Abs and Chest, Arms and Shoulders, Glutes and Legs
+
+    // app.get('workouts/filter/musclegroup', async (req,res) => {
+
+    //     let filter = req.body.workout_entry
+
+    //     let db = MongoUtil.getDB()
+    //     let results = await db.collection("workout_entry").find({
+
+    //     })
+    // })
+
+    // Workout focus - Endurance, Strength, Mobility
+
+    // Difficulty Level - beginner, intermediate, expert
+
 
 }
 
