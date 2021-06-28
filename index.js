@@ -64,6 +64,66 @@ async function main() {
         }
     })
 
+    // Get workout based on Search
+    app.get("/workouts/search", async (req, res) => {
+        let criteria = {}
+        console.log(req.query);
+
+        let criterias;
+        if (req.query.q) {
+            criterias = [{
+                'name': {
+                    $regex: req.query.q,
+                    $options: "i"
+                }
+            }, {
+                'difficulty': {
+                    $regex: req.query.q,
+                    $options: "i"
+                }
+            }, {
+                'intensity': {
+                    $regex: req.query.q,
+                    $options: "i"
+                }
+            }, {
+                'focus': {
+                    $regex: req.query.q,
+                    $options: "i"
+                }
+            }, {
+                'single_exercise': {
+                    $regex: req.query.q,
+                    $options: "i"
+                }
+            }, {
+                'muscle_group': {
+                    $regex: req.query.q,
+                    $options: "i"
+                }
+            }]
+
+        }
+
+        try {
+            let db = MongoUtil.getDB()
+            let result = await db.collection("workout_entry").find({
+                '$or': criterias
+            }).sort({
+                _id: -1
+            }).toArray();
+
+            res.statusCode = 200
+            res.send(result)
+        } catch (e) {
+            res.statusCode = 500
+            res.send({
+                "Message": "Unable to update "
+            });
+            console.log(e)
+        }
+
+    })
     // New Workout Entry - Post
 
     app.post('/workouts/create', async (req, res) => {
@@ -164,11 +224,16 @@ async function main() {
                     single_exercise,
                     muscle_group
                 }
-
             });
+
+            let data = await db.collection("workout_entry").findOne({
+                '_id': ObjectId(req.params.id)
+            });
+
             res.statusCode = 200
             res.send({
-                'Message': 'Workout updated'
+                'Message': 'Workout updated',
+                'data': data
             })
         } catch (e) {
             res.statusCode = 500
@@ -355,87 +420,23 @@ async function main() {
         }
     })
 
-    // Get workout based on Search
-    app.get("/workouts/search", async (req, res) => {
-        let criteria = {}
 
-        if (req.query.name) {
-            criteria['name'] = {
-                $regex: req.query.name,
-                $options: "i"
-            }
-        }
-
-        if (req.query.difficulty) {
-            criteria['difficulty'] = {
-                $regex: req.query.difficulty,
-                $options: "i"
-            }
-        }
-
-        if (req.query.intensity) {
-            criteria['intensity'] = {
-                $regex: req.query.intensity,
-                $options: "i"
-            }
-        }
-
-        if (req.query.focus) {
-            criteria['focus'] = {
-                $in: [req.query.focus]
-            }
-        }
-
-        if (req.query.single_exercise) {
-            criteria['single_exercise'] = {
-                $in: [req.query.single_exercise]
-            }
-        }
-
-        if (req.query.muscle_group) {
-            criteria['muscle_group'] = {
-                $in: [req.query.muscle_group]
-            }
-        }
-
-        if (req.query.name) {
-            criteria['name'] = {
-                $regex: req.query.name,
-                $options: "i"
-            }
-        }
-
-        try {
-            let db = MongoUtil.getDB()
-            let result = await db.collection("workout_entry").find(criteria).sort({
-                _id: -1
-            }).toArray();
-
-            res.statusCode = 200
-            res.send(result)
-        } catch (e) {
-            res.statusCode = 500
-            res.send({
-                "Message": "Unable to update comment"
-            });
-            console.log(e)
-        }
-
-    })
 
     // Get workout based on different filters
 
     //  Muscle group - Abs and Chest, Arms and Shoulders, Glutes and Legs
 
-    // app.get('workouts/filter/musclegroup', async (req,res) => {
+    app.get('workouts/filter/musclegroup', async (req, res) => {
 
-    //     let filter = req.body.workout_entry
+        let filter = req.body.workout_entry
+        criteria['muscle_group'] = {
+            $in: [req.query.muscle_group]
+        }
+        let db = MongoUtil.getDB()
+        let results = await db.collection("workout_entry").find({
 
-    //     let db = MongoUtil.getDB()
-    //     let results = await db.collection("workout_entry").find({
-
-    //     })
-    // })
+        })
+    })
 
     // Workout focus - Endurance, Strength, Mobility
 
