@@ -127,24 +127,32 @@ async function main() {
 
     //  Muscle group - Abs and Chest, Arms and Shoulders, Glutes and Legs
 
-    app.get('workouts/filter/musclegroup', async (req, res) => {
-
+    app.get('/workouts/filter/musclegroup', async (req, res) => {        
         if (req.query.q) {
-            let criteria = []
-            criteria['muscle_group'] = {
-                $in: [req.query.muscle_group]
+            let q = req.query.q.split(",");
+            let criterias = []
+            for(let i of q){
+                criterias.push({
+                    "muscle_group.name": {
+                        "$regex": i,
+                        "$options": "i"
+                    }
+                })
             }
-
             try {
                 let db = MongoUtil.getDB()
-                let results = await db.collection("workout_entry").find(criteria).toArray();
-                res.send(results);
+                let results = await db.collection("workout_entry").find({
+                    '$or': criterias
+                }).sort({
+                    _id: -1
+                }).toArray();
+
                 res.statusCode = 200
-                res.send(result)
+                res.send(results);
             } catch (e) {
                 res.statusCode = 500
                 res.send({
-                    "Message": "Unable to get muscle filter"
+                    "Message": "Unable to get musclegroup filter"
                 });
                 console.log(e)
             }
@@ -152,25 +160,24 @@ async function main() {
     })
 
     // Workout focus - Endurance, Strength, Mobility
-
-    app.get('workouts/filter/workoutfocus', async (req, res) => {
+    app.get('/workouts/filter/workoutfocus', async (req, res) => {
 
         if (req.query.q) {
-            let criteria = []
-            criteria['focus'] = {
-                $in: [req.query.focus]
-            }
-
             try {
                 let db = MongoUtil.getDB()
-                let results = await db.collection("workout_entry").find(criteria).toArray();
-                res.send(results);
+                let results = await db.collection("workout_entry").find({
+                    "focus": {
+                        "$regex": req.query.q,
+                        "$options": "i"
+                    },
+                }).toArray();
+
                 res.statusCode = 200
-                res.send(result)
+                res.send(results);
             } catch (e) {
                 res.statusCode = 500
                 res.send({
-                    "Message": "Unable to get workout focus filter"
+                    "Message": "Unable to get focus filter"
                 });
                 console.log(e)
             }
@@ -179,20 +186,20 @@ async function main() {
 
     // Difficulty Level - beginner, intermediate, expert
 
-    app.get('workouts/filter/difficulty', async (req, res) => {
+    app.get('/workouts/filter/difficulty', async (req, res) => {
 
         if (req.query.q) {
-            let criteria = []
-            criteria['difficulty'] = {
-                $in: [req.query.difficulty]
-            }
-
             try {
                 let db = MongoUtil.getDB()
-                let results = await db.collection("workout_entry").find(criteria).toArray();
-                res.send(results);
+                let results = await db.collection("workout_entry").find({
+                    "difficulty": {
+                        "$regex": req.query.q,
+                        "$options": "i"
+                    },
+                }).toArray();
+
                 res.statusCode = 200
-                res.send(result)
+                res.send(results);
             } catch (e) {
                 res.statusCode = 500
                 res.send({
