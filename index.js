@@ -66,8 +66,6 @@ async function main() {
 
     // Get workout based on Search
     app.get("/workouts/search", async (req, res) => {
-        let criteria = {}
-        console.log(req.query);
 
         let criterias;
         if (req.query.q) {
@@ -118,12 +116,95 @@ async function main() {
         } catch (e) {
             res.statusCode = 500
             res.send({
-                "Message": "Unable to update "
+                "Message": "Unable to get search"
             });
             console.log(e)
         }
 
     })
+
+    // Get workout based on different filters
+
+    //  Muscle group - Abs and Chest, Arms and Shoulders, Glutes and Legs
+
+    app.get('workouts/filter/musclegroup', async (req, res) => {
+
+        if (req.query.q) {
+            let criteria = []
+            criteria['muscle_group'] = {
+                $in: [req.query.muscle_group]
+            }
+
+            try {
+                let db = MongoUtil.getDB()
+                let results = await db.collection("workout_entry").find(criteria).toArray();
+                res.send(results);
+                res.statusCode = 200
+                res.send(result)
+            } catch (e) {
+                res.statusCode = 500
+                res.send({
+                    "Message": "Unable to get muscle filter"
+                });
+                console.log(e)
+            }
+        }
+    })
+
+    // Workout focus - Endurance, Strength, Mobility
+
+    app.get('workouts/filter/workoutfocus', async (req, res) => {
+
+        if (req.query.q) {
+            let criteria = []
+            criteria['focus'] = {
+                $in: [req.query.focus]
+            }
+
+            try {
+                let db = MongoUtil.getDB()
+                let results = await db.collection("workout_entry").find(criteria).toArray();
+                res.send(results);
+                res.statusCode = 200
+                res.send(result)
+            } catch (e) {
+                res.statusCode = 500
+                res.send({
+                    "Message": "Unable to get workout focus filter"
+                });
+                console.log(e)
+            }
+        }
+    })
+
+    // Difficulty Level - beginner, intermediate, expert
+
+    app.get('workouts/filter/difficulty', async (req, res) => {
+
+        if (req.query.q) {
+            let criteria = []
+            criteria['difficulty'] = {
+                $in: [req.query.difficulty]
+            }
+
+            try {
+                let db = MongoUtil.getDB()
+                let results = await db.collection("workout_entry").find(criteria).toArray();
+                res.send(results);
+                res.statusCode = 200
+                res.send(result)
+            } catch (e) {
+                res.statusCode = 500
+                res.send({
+                    "Message": "Unable to get difficulty filter"
+                });
+                console.log(e)
+            }
+        }
+    })
+
+
+
     // New Workout Entry - Post
 
     app.post('/workouts/create', async (req, res) => {
@@ -419,28 +500,6 @@ async function main() {
             })
         }
     })
-
-
-
-    // Get workout based on different filters
-
-    //  Muscle group - Abs and Chest, Arms and Shoulders, Glutes and Legs
-
-    app.get('workouts/filter/musclegroup', async (req, res) => {
-
-        let filter = req.body.workout_entry
-        criteria['muscle_group'] = {
-            $in: [req.query.muscle_group]
-        }
-        let db = MongoUtil.getDB()
-        let results = await db.collection("workout_entry").find({
-
-        })
-    })
-
-    // Workout focus - Endurance, Strength, Mobility
-
-    // Difficulty Level - beginner, intermediate, expert
 
 
 }
