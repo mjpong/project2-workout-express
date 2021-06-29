@@ -123,15 +123,51 @@ async function main() {
 
     })
 
+    app.get("/workouts/searchbyfilter", async (req, res) => {
+
+        let criteria = {};
+
+        if (req.query.difficulty) {
+            criteria['difficulty'] = {
+                $in: [req.query.difficulty]
+            }
+        }
+
+        if (req.query.duration) {
+            criteria['duration'] = {
+                $in: [req.query.duration]
+            }
+        }
+
+        try {
+            let db = MongoUtil.getDB()
+            let result = await db.collection("workout_entry").find({
+                '$and': criteria
+            }).sort({
+                _id: -1
+            }).toArray();
+
+            res.statusCode = 200
+            res.send(result)
+
+        } catch (e) {
+            res.statusCode = 500
+            res.send({
+                "Message": "Unable to get search filter "
+            });
+            console.log(e)
+        }
+    })
+
     // Get workout based on different filters
 
     //  Muscle group - Abs and Chest, Arms and Shoulders, Glutes and Legs
 
-    app.get('/workouts/filter/musclegroup', async (req, res) => {        
+    app.get('/workouts/filter/musclegroup', async (req, res) => {
         if (req.query.q) {
             let q = req.query.q.split(",");
             let criterias = []
-            for(let i of q){
+            for (let i of q) {
                 criterias.push({
                     "muscle_group.name": {
                         "$regex": i,
