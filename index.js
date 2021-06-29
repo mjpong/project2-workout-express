@@ -103,11 +103,51 @@ async function main() {
 
         }
 
+        let final = {
+            "$and": []
+        }
+
+        if (criterias) {
+            final["$and"].push({
+                "$or": criterias
+            });
+        }
+
+        if (req.query.difficulty) {
+            final["$and"].push({
+                "difficulty": {
+                    $regex: req.query.difficulty,
+                    $options: "i"
+                }
+            })
+        }
+
+        if (req.query.duration) {
+            if (req.query.duration == "short") {
+                final["$and"].push({
+                    "duration": {
+                        $lt: 30
+                    }
+                })
+            } else if (req.query.duration == "medium") {
+                final["$and"].push({
+                    "duration": {
+                        $gte: 30,
+                        $lt: 45
+                    }
+                })
+            } else if (req.query.duration == "long") {
+                final["$and"].push({
+                    "duration": {
+                        $gte: 45
+                    }
+                })
+            }
+        }
+
         try {
             let db = MongoUtil.getDB()
-            let result = await db.collection("workout_entry").find({
-                '$or': criterias
-            }).sort({
+            let result = await db.collection("workout_entry").find(final).sort({
                 _id: -1
             }).toArray();
 
@@ -121,42 +161,6 @@ async function main() {
             console.log(e)
         }
 
-    })
-
-    app.get("/workouts/searchbyfilter", async (req, res) => {
-
-        let criteria = {};
-
-        if (req.query.difficulty) {
-            criteria['difficulty'] = {
-                $in: [req.query.difficulty]
-            }
-        }
-
-        if (req.query.duration) {
-            criteria['duration'] = {
-                $in: [req.query.duration]
-            }
-        }
-
-        try {
-            let db = MongoUtil.getDB()
-            let result = await db.collection("workout_entry").find({
-                '$and': criteria
-            }).sort({
-                _id: -1
-            }).toArray();
-
-            res.statusCode = 200
-            res.send(result)
-
-        } catch (e) {
-            res.statusCode = 500
-            res.send({
-                "Message": "Unable to get search filter "
-            });
-            console.log(e)
-        }
     })
 
     // Get workout based on different filters
@@ -219,34 +223,6 @@ async function main() {
             }
         }
     })
-
-    // Difficulty Level - beginner, intermediate, expert
-
-    app.get('/workouts/filter/difficulty', async (req, res) => {
-
-        if (req.query.q) {
-            try {
-                let db = MongoUtil.getDB()
-                let results = await db.collection("workout_entry").find({
-                    "difficulty": {
-                        "$regex": req.query.q,
-                        "$options": "i"
-                    },
-                }).toArray();
-
-                res.statusCode = 200
-                res.send(results);
-            } catch (e) {
-                res.statusCode = 500
-                res.send({
-                    "Message": "Unable to get difficulty filter"
-                });
-                console.log(e)
-            }
-        }
-    })
-
-
 
     // New Workout Entry - Post
 
