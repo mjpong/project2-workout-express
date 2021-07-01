@@ -438,23 +438,18 @@ async function main() {
                 comment_text
             } = req.body
 
-
             let results = await db.collection('workout_entry').updateOne({
-
                 'comments': {
                     '$elemMatch': {
-                        'id': ObjectId(req.params.id)
+                        'id': ObjectId(req.params.c_id)
                     }
                 }
-
             }, {
-
                 '$set': {
                     'comments.$.comment_date': new Date(),
                     'comments.$.comment_name': comment_name,
                     'comments.$.comment_text': comment_text
                 }
-
             })
 
             res.statusCode = 200
@@ -526,6 +521,6 @@ async function main() {
 main()
 
 // start server
-app.listen(3000, () => {
+app.listen(process.env.PORT, () => {
     console.log("Server has started")
 })
