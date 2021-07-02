@@ -90,12 +90,12 @@ async function main() {
                     $options: "i"
                 }
             }, {
-                'single_exercise': {
+                'single_exercise.name': {
                     $regex: req.query.q,
                     $options: "i"
                 }
             }, {
-                'muscle_group': {
+                'muscle_group.name': {
                     $regex: req.query.q,
                     $options: "i"
                 }
