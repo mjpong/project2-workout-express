@@ -33,7 +33,7 @@ async function main() {
 
     app.get('/list/musclegroup', async function (req, res) {
         let db = MongoUtil.getDB();
-        res.send(await db.collection("muscle_group").find().toArray())
+        res.send(await db.collection("muscle_group").find().sort({'name':1}).toArray())
     })
 
     app.get('/list/equipment', async function (req, res) {
@@ -43,7 +43,11 @@ async function main() {
 
     app.get('/list/singleexercise', async function (req, res) {
         db = MongoUtil.getDB();
+<<<<<<< HEAD
         res.send(await db.collection("single_exercise").find().sort({exercise_name:1}).toArray())
+=======
+        res.send(await db.collection("single_exercise").find().sort({"exercise_name": 1}).toArray())
+>>>>>>> 15aa4959c78730adece58c0845360e1e76589295
     })
 
 
@@ -52,7 +56,7 @@ async function main() {
     app.get('/workouts/browse', async (req, res) => {
         try {
             let db = MongoUtil.getDB();
-            let workout_entry = await db.collection("workout_entry").find().toArray();
+            let workout_entry = await db.collection("workout_entry").find().sort({_id:-1}).toArray();
 
             res.statusCode = 200
             res.send(workout_entry)
