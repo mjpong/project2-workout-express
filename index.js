@@ -43,11 +43,7 @@ async function main() {
 
     app.get('/list/singleexercise', async function (req, res) {
         db = MongoUtil.getDB();
-<<<<<<< HEAD
         res.send(await db.collection("single_exercise").find().sort({exercise_name:1}).toArray())
-=======
-        res.send(await db.collection("single_exercise").find().sort({"exercise_name": 1}).toArray())
->>>>>>> 15aa4959c78730adece58c0845360e1e76589295
     })
 
 
