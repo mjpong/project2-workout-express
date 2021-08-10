@@ -15,5 +15,5 @@ User's Goals: To perform CRUD on different workouts and comments.
 
 Github URL: https://github.com/mjpong/project2-workout-react
 
-Live Site URL: https://admiring-bell-406bd7.netlify.app/
+Live Site URL: https://yourtraininggrounds.netlify.app/
 
